@@ -2,7 +2,7 @@ import { SYSTEM_PROMPT } from './systemPrompt';
 import type { ChatMessage, TrackingPlan } from './types';
 import existingEventsData from './existing_events.json';
 
-const SERVER = 'http://localhost:3001';
+const SERVER = import.meta.env.VITE_API_URL ?? '';
 
 export async function sendMessage(
   messages: ChatMessage[],
