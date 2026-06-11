@@ -1,7 +1,8 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "/api/messages", "dest": "/api/messages.cjs" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
