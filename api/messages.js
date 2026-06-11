@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-export const config = { runtime: 'nodejs20.x' };
+export const config = { runtime: 'nodejs' };
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
