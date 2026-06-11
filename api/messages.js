@@ -1,7 +1,6 @@
-// Vercel Serverless Function
-const Anthropic = require('@anthropic-ai/sdk');
+import Anthropic from '@anthropic-ai/sdk';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).end('Method Not Allowed');
     return;
@@ -15,7 +14,7 @@ module.exports = async function handler(req, res) {
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  console.log('[messages] key present:', !!process.env.ANTHROPIC_API_KEY, '| model:', model, '| msgs:', messages?.length);
+  console.log('[messages] key present:', !!process.env.ANTHROPIC_API_KEY, '| msgs:', messages?.length);
 
   try {
     const s = client.messages.stream({
@@ -33,7 +32,7 @@ module.exports = async function handler(req, res) {
     res.end();
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
-    console.error('[messages] stream error:', err);
+    console.error('[messages] error:', err);
     if (!res.headersSent) {
       res.status(500).json({ error });
     } else {
@@ -41,4 +40,4 @@ module.exports = async function handler(req, res) {
       res.end();
     }
   }
-};
+}

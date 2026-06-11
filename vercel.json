@@ -1,11 +1,11 @@
 {
   "functions": {
-    "api/messages.cjs": {
+    "api/messages.js": {
       "runtime": "nodejs20.x"
     }
   },
   "routes": [
-    { "src": "/api/messages", "dest": "/api/messages.cjs" },
+    { "src": "/api/messages", "dest": "/api/messages.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
