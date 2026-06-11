@@ -1,46 +1,44 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs20.x' };
 
-export default async function handler(req) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 });
+    res.status(405).end('Method Not Allowed');
+    return;
   }
 
-  const { model, max_tokens, system, messages } = await req.json();
+  const { model, max_tokens, system, messages } = req.body;
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  const encoder = new TextEncoder();
+  try {
+    const s = client.messages.stream({
+      model: model ?? 'claude-opus-4-7',
+      max_tokens: max_tokens ?? 8192,
+      system,
+      messages,
+    });
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      try {
-        const s = client.messages.stream({
-          model: model ?? 'claude-opus-4-7',
-          max_tokens: max_tokens ?? 8192,
-          system,
-          messages,
-        });
+    for await (const event of s) {
+      res.write(`data: ${JSON.stringify(event)}
 
-        for await (const event of s) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
-        }
+`);
+    }
 
-        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-      } catch (err) {
-        const error = err instanceof Error ? err.message : String(err);
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error })}\n\n`));
-      } finally {
-        controller.close();
-      }
-    },
-  });
+    res.write('data: [DONE]
 
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-    },
-  });
+');
+    res.end();
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    res.write(`data: ${JSON.stringify({ error })}
+
+`);
+    res.end();
+  }
 }
