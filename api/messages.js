@@ -1,7 +1,7 @@
 // Vercel Serverless Function
-import Anthropic from '@anthropic-ai/sdk';
+const Anthropic = require('@anthropic-ai/sdk');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).end('Method Not Allowed');
     return;
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  console.log('[messages] key present:', !!process.env.ANTHROPIC_API_KEY, '| model:', model, '| messages:', messages?.length);
+  console.log('[messages] key present:', !!process.env.ANTHROPIC_API_KEY, '| model:', model, '| msgs:', messages?.length);
 
   try {
     const s = client.messages.stream({
@@ -26,14 +26,10 @@ export default async function handler(req, res) {
     });
 
     for await (const event of s) {
-      res.write(`data: ${JSON.stringify(event)}
-
-`);
+      res.write('data: ' + JSON.stringify(event) + '\n\n');
     }
 
-    res.write('data: [DONE]
-
-');
+    res.write('data: [DONE]\n\n');
     res.end();
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
@@ -41,8 +37,8 @@ export default async function handler(req, res) {
     if (!res.headersSent) {
       res.status(500).json({ error });
     } else {
-      res.write(`data: ${JSON.stringify({ error })}\n\n`);
+      res.write('data: ' + JSON.stringify({ error }) + '\n\n');
       res.end();
     }
   }
-}
+};
