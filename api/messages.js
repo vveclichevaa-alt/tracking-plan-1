@@ -1,3 +1,4 @@
+// Vercel Serverless Function
 import Anthropic from '@anthropic-ai/sdk';
 
 export const config = { runtime: 'nodejs' };
