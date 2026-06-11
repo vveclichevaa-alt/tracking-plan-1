@@ -15,6 +15,8 @@ export default async function handler(req, res) {
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+  console.log('[messages] key present:', !!process.env.ANTHROPIC_API_KEY, '| model:', model, '| messages:', messages?.length);
+
   try {
     const s = client.messages.stream({
       model: model ?? 'claude-opus-4-7',
@@ -35,9 +37,12 @@ export default async function handler(req, res) {
     res.end();
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
-    res.write(`data: ${JSON.stringify({ error })}
-
-`);
-    res.end();
+    console.error('[messages] stream error:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ error });
+    } else {
+      res.write(`data: ${JSON.stringify({ error })}\n\n`);
+      res.end();
+    }
   }
 }
