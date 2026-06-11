@@ -1,6 +1,9 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "functions": {
+    "api/messages.cjs": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "routes": [
     { "src": "/api/messages", "dest": "/api/messages.cjs" },
     { "src": "/(.*)", "dest": "/index.html" }
