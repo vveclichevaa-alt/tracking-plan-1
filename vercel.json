@@ -1,6 +1,5 @@
 {
-  "routes": [
-    { "src": "/api/messages", "dest": "/api/messages.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
