@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { FileUpload } from './components/FileUpload';
 import { Chat } from './components/Chat';
 import { SessionPanel } from './components/SessionPanel';
+import { LoginScreen, isAuthenticated } from './components/LoginScreen';
 import type { ChatMessage, ScreenSource, TrackingPlan } from './lib/types';
 import {
   generateId,
@@ -14,6 +15,7 @@ import type { StoredSession } from './lib/sessions';
 import './index.css';
 
 export default function App() {
+  const [authed, setAuthed] = useState(() => isAuthenticated());
   const [sessions, setSessions] = useState<StoredSession[]>(() => loadSessions());
   const [currentSessionId, setCurrentSessionId] = useState<string>(() => generateId());
   const [source, setSource] = useState<ScreenSource | null>(null);
@@ -69,6 +71,10 @@ export default function App() {
       return cur;
     });
   }, []);
+
+  if (!authed) {
+    return <LoginScreen onLogin={() => setAuthed(true)} />;
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
