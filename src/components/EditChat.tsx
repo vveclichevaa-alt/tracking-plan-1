@@ -25,6 +25,21 @@ function makeId() {
   return `edit-${++editIdCounter}`;
 }
 
+const TAXONOMY_FIELD_REGEX = /^[A-Za-z]+$/;
+
+function validateTaxonomy(plan: TrackingPlan): string[] {
+  const violations: string[] = [];
+  plan.events.forEach((event, index) => {
+    (['event_category', 'event_label', 'event_name'] as const).forEach((field) => {
+      const value = event[field];
+      if (!TAXONOMY_FIELD_REGEX.test(value)) {
+        violations.push(`Событие ${index + 1}: ${field} = "${value}" (только латинские буквы, без цифр и спецсимволов)`);
+      }
+    });
+  });
+  return violations;
+}
+
 export function EditChat({ plan, onPlanUpdate }: Props) {
   const [entries, setEntries] = useState<EditEntry[]>([]);
   const [input, setInput] = useState('');
@@ -64,6 +79,20 @@ export function EditChat({ plan, onPlanUpdate }: Props) {
       setEntries((prev) => [
         ...prev,
         { id: makeId(), role: 'assistant', content: fullText || 'Не удалось применить правку.' },
+      ]);
+      return;
+    }
+
+    const taxonomyViolations = validateTaxonomy(parsed);
+    if (taxonomyViolations.length > 0) {
+      setEntries((prev) => [
+        ...prev,
+        {
+          id: makeId(),
+          role: 'assistant',
+          content: `Не могу применить правку — нарушены правила таксономии: ${taxonomyViolations.join('; ')}. event_category, event_label, event_name должны содержать только латинские буквы CamelCase.`,
+          isWarning: true,
+        },
       ]);
       return;
     }
