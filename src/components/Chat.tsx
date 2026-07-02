@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ChatMessage, ScreenSource, TrackingPlan } from '../lib/types';
 import { checkAgainstExistingEvents, findDuplicates, findLengthViolations, sendMessage, stripImagesFromMessages, tryParseTrackingPlan } from '../lib/claude';
+import { EditChat } from './EditChat';
 import { MessageBubble } from './MessageBubble';
 import { DownloadPanel } from './DownloadPanel';
 
@@ -397,6 +398,7 @@ export function Chat({ source, initialMessages, initialPlan, onUpdate }: Props) 
         )}
 
         {!planBuilding && plan && <DownloadPanel plan={plan} />}
+        {!planBuilding && plan && <EditChat plan={plan} onPlanUpdate={setPlan} />}
 
         <div ref={bottomRef} />
       </div>
