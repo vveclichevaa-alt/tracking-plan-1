@@ -149,7 +149,7 @@ export function EditChat({ plan, onPlanUpdate }: Props) {
     setStreamingText('');
 
     const contextUserContent =
-      `Текущий трекинг-план:\n${JSON.stringify(plan, null, 2)}\n\nПравка: ${editText}`;
+      `ВАЖНО: Строго соблюдай правила таксономии. event_category, event_label, event_name — только латинские буквы CamelCase, никаких спецсимволов (_), дефисов (-), пробелов, цифр. Если правка нарушает эти правила — откажи и объясни причину.\n\nТекущий трекинг-план:\n${JSON.stringify(plan, null, 2)}\n\nПравка: ${editText}`;
 
     try {
       await applyWithValidation(contextUserContent, [], false);
